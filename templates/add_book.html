@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="ku" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>کتێب زیاد بکە - کتیبخانەی Xor</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* All your old styles here (no changes) */
+    :root { --primary-color: #2563eb; --secondary-color: #1d4ed8; }
+    body { background: #fefdfb; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .navbar { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .navbar-brand, .nav-link { color: white !important; }
+    .form-container { max-width: 800px; margin: 3rem auto; background: white; padding: 3rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+    .form-title { text-align: center; margin-bottom: 2rem; color: var(--primary-color); font-weight: 700; }
+    .form-label { font-weight: 600; color: #333; margin-bottom: 0.5rem; }
+    .form-control, .form-select { border: 2px solid #e2e8f0; border-radius: 10px; padding: 0.75rem; transition: all 0.3s ease; }
+    .form-control:focus, .form-select:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+    .category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
+    .category-item { display: flex; align-items: center; padding: 0.75rem; background: #f8fafc; border-radius: 10px; transition: all 0.3s ease; }
+    .category-item:hover { background: #e0f2fe; transform: translateX(-3px); }
+    .category-item input[type="radio"] { width: 20px; height: 20px; margin-left: 0.5rem; cursor: pointer; }
+    .category-item label { cursor: pointer; margin: 0; flex-grow: 1; }
+    .btn-submit { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; border: none; padding: 1rem 3rem; border-radius: 12px; font-weight: 600; font-size: 1.1rem; width: 100%; transition: all 0.3s ease; }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3); }
+    .file-upload { position: relative; overflow: hidden; }
+    .file-upload input[type="file"] { cursor: pointer; }
+    .required { color: #ef4444; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container">
+    <a class="navbar-brand" href="{{ url_for('index') }}">
+      <i class="fas fa-book-open"></i> کتیبخانەی xor
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('index') }}">
+            <i class="fas fa-home"></i> ماڵەوە
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('logout') }}">
+            <i class="fas fa-sign-out-alt"></i> چونەدەرەوە
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="form-container">
+    <h2 class="form-title">
+      <i class="fas fa-plus-circle"></i>
+      زیادکردنی کتێبی نوێ
+    </h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" enctype="multipart/form-data">
+      <!-- Title -->
+      <div class="mb-4">
+        <label class="form-label">
+          <i class="fas fa-book"></i>
+          ناوی کتێب <span class="required">*</span>
+        </label>
+        <input type="text" name="title" class="form-control" placeholder="ناوی کتێب بنووسە..." required>
+      </div>
+
+      <!-- Image Upload -->
+      <div class="mb-4">
+        <label class="form-label">
+          <i class="fas fa-image"></i>
+          وێنەی کتێب <span class="required">*</span>
+        </label>
+        <input type="file" name="image" class="form-control file-upload" accept="image/*" required>
+        <small class="text-muted">جۆری وێنە: PNG, JPG, JPEG, GIF, WEBP</small>
+      </div>
+
+      <!-- PDF Upload -->
+      <div class="mb-4">
+        <label class="form-label">
+          <i class="fas fa-file-pdf"></i>
+          فایلی PDF <span class="required">*</span>
+        </label>
+        <input type="file" name="pdf" class="form-control file-upload" accept=".pdf" required>
+        <small class="text-muted">تەنها فایلی PDF</small>
+      </div>
+
+      <!-- Download Link -->
+      <div class="mb-4">
+        <label class="form-label">
+          <i class="fas fa-link"></i>
+          لینکی دابەزاندن (اختیاری)
+        </label>
+        <input type="url" name="download_link" class="form-control" placeholder="https://example.com/book.pdf">
+        <small class="text-muted">ئەگەر فایلی PDF دانەکراوە، ئەم لینکی دابەزاندنە بەکار دەهێنرێت.</small>
+      </div>
+
+      <!-- Category Selection -->
+      <div class="mb-4">
+        <label class="form-label">
+          <i class="fas fa-tag"></i>
+          پۆلێن <span class="required">*</span>
+        </label>
+        <div class="category-grid">
+          {% for category in categories %}
+          <div class="category-item">
+            <input type="radio" name="category" id="cat_{{ loop.index }}" value="{{ category }}" required>
+            <label for="cat_{{ loop.index }}">{{ category }}</label>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Language Selection -->
+      <div class="mb-4">
+        <label class="form-label">
+          <i class="fas fa-language"></i>
+          زمان <span class="required">*</span>
+        </label>
+        <select name="language" class="form-select" required>
+          <option value="" selected disabled>زمان هەڵبژێرە...</option>
+          {% for language in languages %}
+          <option value="{{ language }}">{{ language }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="btn btn-submit">
+        <i class="fas fa-check-circle"></i>
+        کتێبەکە زیاد بکە
+      </button>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

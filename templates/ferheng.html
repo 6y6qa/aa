@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="ku" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>فەرهەنگ - کتیبخانەی Xor</title>
+  <link rel="icon" href="{{ url_for('static', filename='book.png') }}" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --secondary: #1d4ed8;
+      --teal: #0d9488;
+      --teal-light: #14b8a6;
+      --bg: #fefdfb;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+    }
+    body.dark-mode {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); transition: all 0.3s; }
+
+    /* NAVBAR */
+    .navbar { background: linear-gradient(135deg, var(--primary), var(--secondary)) !important; box-shadow: 0 4px 20px rgba(0,0,0,0.15); padding: 1rem 0; }
+    .navbar-brand { font-size: 1.5rem; font-weight: 700; color: white !important; display: flex; align-items: center; gap: 0.5rem; }
+    .nav-link { color: rgba(255,255,255,0.9) !important; font-weight: 500; padding: 0.5rem 1rem !important; border-radius: 8px; transition: all 0.3s; }
+    .nav-link:hover { background: rgba(255,255,255,0.15); color: white !important; }
+    #modeToggle { border: 2px solid rgba(255,255,255,0.4); border-radius: 25px; padding: 0.4rem 1.1rem; font-weight: 600; }
+
+    /* HERO */
+    .ferheng-hero {
+      background: linear-gradient(135deg, #042f2e 0%, #0f4c45 60%, #065f46 100%);
+      color: white; padding: 5rem 0 3rem; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .ferheng-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at center, rgba(20,184,166,0.2) 0%, transparent 65%);
+    }
+    /* Floating letters background */
+    .floating-letters {
+      position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+    }
+    .fl-letter {
+      position: absolute;
+      font-size: 3rem;
+      color: rgba(20,184,166,0.1);
+      font-weight: 900;
+      animation: floatLetter 6s ease-in-out infinite;
+    }
+    @keyframes floatLetter {
+      0%, 100% { transform: translateY(0) rotate(-5deg); }
+      50% { transform: translateY(-20px) rotate(5deg); }
+    }
+    .ferheng-hero h1 {
+      font-size: 3rem; font-weight: 800; margin-bottom: 1rem;
+      position: relative; z-index: 1;
+      background: linear-gradient(135deg, #5eead4, #2dd4bf, #0d9488);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .ferheng-hero p { font-size: 1.1rem; opacity: 0.8; position: relative; z-index: 1; color: #99f6e4; }
+    .hero-book-icon { font-size: 4rem; margin-bottom: 1.5rem; position: relative; z-index: 1; color: #2dd4bf; }
+
+    /* MAIN SEARCH */
+    .main-search-wrapper {
+      max-width: 650px; margin: 0 auto;
+      position: relative; z-index: 2; margin-top: -1.5rem;
+    }
+    .main-search-box {
+      background: var(--card);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      padding: 2rem;
+    }
+    .big-search-input {
+      width: 100%;
+      border: 3px solid rgba(13,148,136,0.3);
+      border-radius: 15px;
+      padding: 1.2rem 1.5rem;
+      font-size: 1.3rem;
+      background: var(--bg);
+      color: var(--text);
+      transition: all 0.3s;
+      text-align: center;
+    }
+    .big-search-input:focus {
+      outline: none;
+      border-color: var(--teal);
+      box-shadow: 0 0 0 4px rgba(13,148,136,0.15);
+    }
+    .search-hint { text-align: center; color: var(--muted); font-size: 0.9rem; margin-top: 0.8rem; }
+
+    /* ALPHABET NAV */
+    .alphabet-nav {
+      display: flex; flex-wrap: wrap; gap: 0.4rem;
+      justify-content: center;
+      margin: 2.5rem 0 2rem;
+    }
+    .alpha-btn {
+      width: 44px; height: 44px;
+      background: var(--card);
+      border: 2px solid rgba(13,148,136,0.2);
+      color: var(--teal);
+      border-radius: 10px;
+      font-weight: 700; font-size: 1.1rem;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .alpha-btn:hover, .alpha-btn.active {
+      background: var(--teal); color: white;
+      border-color: var(--teal);
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(13,148,136,0.3);
+    }
+
+    /* WORDS GRID */
+    .words-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .word-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+      transition: all 0.3s ease;
+      border-top: 4px solid var(--teal);
+      position: relative;
+      cursor: pointer;
+    }
+    .word-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+    }
+    .word-main {
+      font-size: 1.6rem; font-weight: 800;
+      color: var(--teal); margin-bottom: 0.3rem;
+    }
+    .word-transliteration {
+      font-size: 0.9rem; color: var(--muted); font-style: italic;
+      margin-bottom: 1rem;
+    }
+    .word-divider {
+      height: 1px; background: linear-gradient(to left, transparent, rgba(13,148,136,0.3), transparent);
+      margin: 0.8rem 0;
+    }
+    .word-definition {
+      font-size: 1rem; line-height: 1.8; color: var(--text);
+    }
+    .word-definition.collapsed {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .word-example {
+      margin-top: 1rem;
+      padding: 0.8rem 1rem;
+      background: rgba(13,148,136,0.07);
+      border-radius: 10px;
+      border-right: 3px solid var(--teal);
+      font-size: 0.95rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+    .word-example strong { color: var(--teal); font-style: normal; }
+    .word-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 1rem; }
+    .word-tag {
+      padding: 0.25rem 0.7rem;
+      background: rgba(13,148,136,0.1);
+      color: var(--teal);
+      border-radius: 15px;
+      font-size: 0.8rem; font-weight: 600;
+    }
+    .word-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 1rem; padding-top: 0.8rem;
+      border-top: 1px solid rgba(0,0,0,0.05);
+    }
+    .dark-mode .word-footer { border-top-color: rgba(255,255,255,0.05); }
+    .word-expand {
+      background: none; border: 2px solid var(--teal); color: var(--teal);
+      border-radius: 20px; padding: 0.3rem 1rem;
+      font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s;
+    }
+    .word-expand:hover { background: var(--teal); color: white; }
+
+    /* ADMIN DELETE */
+    .word-admin { margin-top: 0.5rem; }
+    .btn-del { padding: 0.3rem 0.8rem; background: #ef4444; color: white; border: none; border-radius: 8px; font-size: 0.8rem; cursor: pointer; }
+
+    /* RESULTS HEADER */
+    .results-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
+    }
+    .results-count {
+      font-size: 1.1rem; font-weight: 600; color: var(--muted);
+    }
+    .results-count span { color: var(--teal); }
+
+    /* EMPTY STATE */
+    .empty-ferheng {
+      text-align: center; padding: 5rem 2rem; color: var(--muted);
+      grid-column: 1 / -1;
+    }
+    .empty-ferheng i { font-size: 5rem; opacity: 0.2; margin-bottom: 1.5rem; display: block; color: var(--teal); }
+
+    /* Dark mode */
+    .dark-mode .word-card { box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+    .dark-mode .main-search-box { box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container">
+    <a class="navbar-brand" href="{{ url_for('index') }}">
+      <i class="fas fa-book-open"></i> کتیبخانەی xor
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}"><i class="fas fa-home"></i> ماڵەوە</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('nusar') }}"><i class="fas fa-users"></i> نووسەران</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('lekolin') }}"><i class="fas fa-flask"></i> لێکۆڵینەوە</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('honraw') }}"><i class="fas fa-feather-alt"></i> هۆنراوە</a></li>
+        <li class="nav-item"><a class="nav-link active" href="{{ url_for('ferheng') }}"><i class="fas fa-spell-check"></i> فەرهەنگ</a></li>
+        {% if session.get('logged_in') %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_panel') }}"><i class="fas fa-cog"></i> بەڕێوەبردن</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> چونەدەرەوە</a></li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt"></i> چوونەژوورەوە</a></li>
+        {% endif %}
+      </ul>
+      <button id="modeToggle" class="btn btn-outline-light btn-sm"><i class="fas fa-moon"></i> تاریک</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="ferheng-hero">
+  <div class="floating-letters" id="floatingLetters"></div>
+  <div class="container" style="position: relative; z-index: 1;">
+    <div class="hero-book-icon"><i class="fas fa-spell-check"></i></div>
+    <h1>فەرهەنگی وشەکان</h1>
+    <p>وشەی کوردی لەگەڵ مانای و نموونە بدۆزەرەوە</p>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- SEARCH BOX -->
+  <div class="main-search-wrapper mt-4">
+    <div class="main-search-box">
+      <form method="GET">
+        <input type="text" name="q" id="wordSearch" class="big-search-input"
+               placeholder="وشەکە بنووسە..."
+               value="{{ query }}"
+               autocomplete="off">
+        <p class="search-hint"><i class="fas fa-lightbulb"></i> وشەیەک بنووسە تا مانای و نموونەکانی ببینیت</p>
+      </form>
+    </div>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}{% for category, message in messages %}
+      <div class="alert alert-{{ category }} rounded-3 mt-3">{{ message }}</div>
+    {% endfor %}{% endif %}
+  {% endwith %}
+
+  <!-- ALPHABET NAVIGATION -->
+  <div class="alphabet-nav" id="alphaNav">
+    {% set letters = ['ئ','ا','ب','پ','ت','ج','چ','ح','خ','د','ر','ز','ژ','س','ش','ع','غ','ف','ڤ','ق','ک','گ','ل','م','ن','و','ه','ی'] %}
+    <button class="alpha-btn active" onclick="filterAlpha('', this)">هەموو</button>
+    {% for letter in letters %}
+    <button class="alpha-btn" onclick="filterAlpha('{{ letter }}', this)">{{ letter }}</button>
+    {% endfor %}
+  </div>
+
+  <!-- RESULTS HEADER -->
+  <div class="results-header">
+    <div class="results-count">
+      کۆی وشەکان: <span>{{ words|length }}</span>
+    </div>
+  </div>
+
+  <!-- WORDS GRID -->
+  <div class="words-grid" id="wordsGrid">
+    {% if words %}
+      {% for word in words %}
+      <div class="word-card" data-word="{{ word['word'] }}" id="word-{{ word['id'] }}">
+        <div class="word-main">{{ word['word'] }}</div>
+        {% if word['transliteration'] %}
+        <div class="word-transliteration">[ {{ word['transliteration'] }} ]</div>
+        {% endif %}
+
+        <div class="word-divider"></div>
+
+        <div class="word-definition collapsed" id="def-{{ word['id'] }}">
+          {{ word['definition'] }}
+        </div>
+
+        {% if word['example'] %}
+        <div class="word-example">
+          <strong>نموونە:</strong> {{ word['example'] }}
+        </div>
+        {% endif %}
+
+        <div class="word-tags">
+          {% if word['category'] %}
+          <span class="word-tag"><i class="fas fa-tag"></i> {{ word['category'] }}</span>
+          {% endif %}
+          {% if word['language_origin'] %}
+          <span class="word-tag"><i class="fas fa-globe"></i> {{ word['language_origin'] }}</span>
+          {% endif %}
+        </div>
+
+        <div class="word-footer">
+          <small style="color: var(--muted);">
+            <i class="fas fa-calendar-alt"></i>
+            {{ word['created_at'][:10] if word['created_at'] else '' }}
+          </small>
+          <button class="word-expand" onclick="toggleDef({{ word['id'] }}, this)">
+            <i class="fas fa-expand-alt"></i> زیاتر
+          </button>
+        </div>
+
+        {% if session.get('logged_in') %}
+        <div class="word-admin">
+          <a href="{{ url_for('delete_word', word_id=word['id']) }}"
+             onclick="return confirm('دڵنیایت لە سڕینەوەی ئەم وشەیە؟')"
+             class="btn-del"><i class="fas fa-trash"></i></a>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    {% else %}
+    <div class="empty-ferheng">
+      <i class="fas fa-search"></i>
+      <h3>هیچ وشەیەک نەدۆزرایەوە</h3>
+      <p>وشەیەکی تر بنووسە یان بەشی فەرهەنگ تازە دەکرێتەوە</p>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<div style="height: 80px;"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Floating letters
+  const letters = ['ک','و','ر','د','ی','ز','م','ا','ن','ه','ب','پ','ت','ج'];
+  const container = document.getElementById('floatingLetters');
+  letters.forEach((letter, i) => {
+    const el = document.createElement('div');
+    el.className = 'fl-letter';
+    el.textContent = letter;
+    el.style.cssText = `
+      top: ${10 + Math.random() * 80}%;
+      left: ${Math.random() * 100}%;
+      animation-delay: ${i * 0.4}s;
+      animation-duration: ${4 + Math.random() * 4}s;
+      font-size: ${2 + Math.random() * 3}rem;
+    `;
+    container.appendChild(el);
+  });
+
+  // Toggle definition expand
+  function toggleDef(id, btn) {
+    const def = document.getElementById('def-' + id);
+    const isCollapsed = def.classList.contains('collapsed');
+    if (isCollapsed) {
+      def.classList.remove('collapsed');
+      btn.innerHTML = '<i class="fas fa-compress-alt"></i> کورتکردنەوە';
+    } else {
+      def.classList.add('collapsed');
+      btn.innerHTML = '<i class="fas fa-expand-alt"></i> زیاتر';
+    }
+  }
+
+  // Alphabet filter
+  function filterAlpha(letter, btn) {
+    document.querySelectorAll('.alpha-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const cards = document.querySelectorAll('.word-card');
+    cards.forEach(card => {
+      if (!letter || card.dataset.word.startsWith(letter)) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  // Live search
+  document.getElementById('wordSearch').addEventListener('input', function() {
+    const q = this.value.toLowerCase().trim();
+    document.querySelectorAll('.word-card').forEach(card => {
+      const word = card.dataset.word.toLowerCase();
+      card.style.display = (!q || word.includes(q)) ? '' : 'none';
+    });
+  });
+
+  // Dark mode
+  const modeToggle = document.getElementById('modeToggle');
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark-mode');
+    modeToggle.innerHTML = '<i class="fas fa-sun"></i> ڕۆشنایی';
+  }
+  modeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    modeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i> ڕۆشنایی' : '<i class="fas fa-moon"></i> تاریک';
+  });
+</script>
+</body>
+</html>

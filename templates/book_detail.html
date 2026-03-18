@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="ku" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ book['title'] }} -  گەڕان</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --secondary-color: #1d4ed8;
+    }
+
+    body {
+      background: #fefdfb;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .navbar {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .navbar-brand, .nav-link {
+      color: white !important;
+    }
+
+    .book-detail-container {
+      max-width: 1200px;
+      margin: 3rem auto;
+      padding: 0 1rem;
+    }
+
+    .book-card {
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .book-layout {
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      gap: 3rem;
+      padding: 3rem;
+    }
+
+    @media (max-width: 992px) {
+      .book-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding: 2rem;
+      }
+    }
+
+    .book-image-section {
+      position: relative;
+    }
+
+    .book-image {
+      width: 100%;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      transition: transform 0.3s ease;
+    }
+
+    .book-image:hover {
+      transform: scale(1.02);
+    }
+
+    .book-info-section h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 1.5rem;
+      line-height: 1.3;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      background: #f8fafc;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .info-item:hover {
+      background: #e0f2fe;
+      transform: translateX(-5px);
+    }
+
+    .info-icon {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.3rem;
+      margin-left: 1rem;
+    }
+
+    .info-content {
+      flex-grow: 1;
+    }
+
+    .info-label {
+      font-size: 0.85rem;
+      color: #64748b;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+
+    .info-value {
+      font-size: 1.1rem;
+      color: #1e293b;
+      font-weight: 700;
+    }
+
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 576px) {
+      .action-buttons {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .btn-action {
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .btn-read {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+    }
+
+    .btn-read:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+      color: white;
+    }
+
+    .btn-download {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+    }
+
+    .btn-download:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+      color: white;
+    }
+
+    .btn-delete {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      margin-top: 1rem;
+    }
+
+    .btn-delete:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+      color: white;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+      margin-bottom: 2rem;
+      transition: all 0.3s ease;
+    }
+
+    .back-link:hover {
+      color: var(--secondary-color);
+      transform: translateX(5px);
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container">
+    <a class="navbar-brand" href="{{ url_for('index') }}">
+      <i class="fas fa-book-open"></i>  گەڕان
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('index') }}">
+            <i class="fas fa-home"></i> ماڵەوە
+          </a>
+        </li>
+        {% if session.get('logged_in') %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('add_book') }}">
+              <i class="fas fa-plus-circle"></i> کتێب زیاد بکە
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('logout') }}">
+              <i class="fas fa-sign-out-alt"></i> چونەدەرەوە
+            </a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('login') }}">
+              <i class="fas fa-sign-in-alt"></i> چوونەژوورەوە
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container book-detail-container">
+  <a href="{{ url_for('index') }}" class="back-link">
+    <i class="fas fa-arrow-right"></i>
+    گەڕانەوە بۆ لیست
+  </a>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="book-card">
+    <div class="book-layout">
+      <!-- Book Image -->
+      <div class="book-image-section">
+        <img src="{{ url_for('static', filename='uploads/' ~ book['image']) }}" 
+             class="book-image" 
+             alt="{{ book['title'] }}">
+      </div>
+
+      <!-- Book Info -->
+      <div class="book-info-section">
+        <h1>{{ book['title'] }}</h1>
+
+        <div class="info-item">
+          <div class="info-icon">
+            <i class="fas fa-tag"></i>
+          </div>
+          <div class="info-content">
+            <div class="info-label">پۆلێن</div>
+            <div class="info-value">{{ book['category'] }}</div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon">
+            <i class="fas fa-language"></i>
+          </div>
+          <div class="info-content">
+            <div class="info-label">زمان</div>
+            <div class="info-value">{{ book['language'] }}</div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon">
+            <i class="fas fa-calendar-alt"></i>
+          </div>
+          <div class="info-content">
+            <div class="info-label">بەرواری زیادکردن</div>
+            <div class="info-value">{{ book['created_at'][:10] if book['created_at'] else 'نادیار' }}</div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <a href="{{ url_for('read_book', book_id=book['id']) }}" class="btn-action btn-read">
+            <i class="fas fa-book-reader"></i>
+            خوێندنەوەی کتێب
+          </a>
+
+          {% if book['download_link'] %}
+          <a href="{{ book['download_link'] }}" target="_blank" class="btn-action btn-download">
+            <i class="fas fa-download"></i>
+            دابەزاندن
+          </a>
+          {% elif session.get('logged_in') and book['pdf'] %}
+          <a href="{{ url_for('download_book', book_id=book['id']) }}" class="btn-action btn-download">
+            <i class="fas fa-download"></i>
+            دابەزاندن
+          </a>
+          {% endif %}
+        </div>
+
+        {% if session.get('logged_in') %}
+        <a href="{{ url_for('delete_book', book_id=book['id']) }}" 
+           class="btn-action btn-delete"
+           onclick="return confirm('دڵنیایت لە سڕینەوەی ئەم کتێبە؟')">
+          <i class="fas fa-trash"></i>
+          سڕینەوەی کتێب
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="height: 100px;"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

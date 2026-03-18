@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="ku" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>خوێندنەوە: {{ book['title'] }} -  گەڕان</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --secondary-color: #1d4ed8;
+      --bg-color: #fefdfb;
+      --text-color: #1e293b;
+      --page-bg: #ffffff;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    body.dark-mode {
+      --bg-color: #0f172a;
+      --text-color: #f1f5f9;
+      --page-bg: #1e293b;
+    }
+
+    .navbar {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar-brand, .nav-link { color: white !important; }
+
+    .reading-header {
+      background: var(--page-bg);
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 56px;
+      z-index: 999;
+    }
+
+    .reading-header-content {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .book-title-header {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      flex-grow: 1;
+    }
+
+    .reading-controls { display: flex; gap: 0.5rem; align-items: center; }
+
+    .control-btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .control-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+
+    .font-size-controls { display: flex; gap: 0.5rem; }
+
+    .font-btn {
+      width: 40px; height: 40px;
+      border: none;
+      border-radius: 8px;
+      background: #e2e8f0;
+      color: #1e293b;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .dark-mode .font-btn { background: #334155; color: #f1f5f9; }
+    .font-btn:hover { background: var(--primary-color); color: white; transform: scale(1.1); }
+
+    .reading-container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+
+    /* Replace page-content with iframe height */
+    .page-content {
+      background: var(--page-bg);
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+      height: 80vh; /* iframe height */
+      overflow: hidden;
+      padding: 0;
+    }
+
+    @media (max-width: 768px) { .page-content { height: 60vh; } }
+
+    .navigation-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .nav-btn {
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3); }
+    .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+      margin-bottom: 2rem;
+      transition: all 0.3s ease;
+    }
+    .back-link:hover { color: var(--secondary-color); transform: translateX(5px); }
+
+    .loading { text-align: center; padding: 3rem; color: var(--primary-color); }
+    .loading i { font-size: 3rem; animation: spin 1s linear infinite; }
+
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container">
+    <a class="navbar-brand" href="{{ url_for('index') }}">
+      <i class="fas fa-book-open"></i>  گەڕان
+    </a>
+  </div>
+</nav>
+
+<div class="reading-header">
+  <div class="reading-header-content">
+    <div class="book-title-header">
+      <i class="fas fa-book-reader"></i> {{ book['title'] }}
+    </div>
+    <div class="reading-controls">
+      <div class="font-size-controls">
+        <button class="font-btn" onclick="changeFontSize(-2)" title="کەمکردنەوەی قەبارەی فۆنت">
+          <i class="fas fa-minus"></i>
+        </button>
+        <button class="font-btn" onclick="changeFontSize(2)" title="زیادکردنی قەبارەی فۆنت">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+      <button class="control-btn" onclick="toggleDarkMode()">
+        <i class="fas fa-moon"></i>
+        <span id="modeText">تاریک</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="container reading-container">
+  <a href="{{ url_for('book_detail', book_id=book['id']) }}" class="back-link">
+    <i class="fas fa-arrow-right"></i>
+    گەڕانەوە بۆ زانیاری کتێب
+  </a>
+
+  <!-- PDF iframe embedded -->
+  <div class="page-content">
+    <iframe src="{{ url_for('serve_pdf', filename=book['pdf']) }}" style="width:100%; height:100%; border:none;"></iframe>
+  </div>
+
+  <div class="navigation-buttons">
+    <button class="nav-btn" onclick="scrollToTop()">
+      <i class="fas fa-arrow-up"></i> گەڕانەوە بۆ سەرەوە
+    </button>
+    <a href="{{ url_for('book_detail', book_id=book['id']) }}" class="nav-btn" style="text-decoration: none;">
+      <i class="fas fa-times"></i> داخستنی خوێندنەوە
+    </a>
+  </div>
+</div>
+
+<div style="height: 100px;"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let currentFontSize = 18;
+const savedFontSize = localStorage.getItem('fontSize');
+const savedTheme = localStorage.getItem('readingTheme');
+if (savedFontSize) { currentFontSize = parseInt(savedFontSize); }
+if (savedTheme === 'dark') { document.body.classList.add('dark-mode'); updateModeText(); }
+
+function changeFontSize(change) {
+  currentFontSize += change;
+  if (currentFontSize < 12) currentFontSize = 12;
+  if (currentFontSize > 32) currentFontSize = 32;
+  localStorage.setItem('fontSize', currentFontSize);
+}
+function toggleDarkMode() {
+  document.body.classList.toggle('dark-mode');
+  localStorage.setItem('readingTheme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+  updateModeText();
+}
+function updateModeText() {
+  const modeText = document.getElementById('modeText');
+  modeText.textContent = document.body.classList.contains('dark-mode') ? 'ڕۆشنایی' : 'تاریک';
+}
+function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+</script>
+</body>
+</html>

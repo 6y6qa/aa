@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="ku" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>لێکۆڵینەوە - کتیبخانەی Xor</title>
+  <link rel="icon" href="{{ url_for('static', filename='book.png') }}" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --secondary: #1d4ed8;
+      --accent: #3b82f6;
+      --adabi: #7c3aed;
+      --honari: #db2777;
+      --zansti: #059669;
+      --bg: #fefdfb;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+    }
+    body.dark-mode {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: all 0.3s ease;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      background: linear-gradient(135deg, var(--primary), var(--secondary)) !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      padding: 1rem 0;
+    }
+    .navbar-brand {
+      font-size: 1.5rem; font-weight: 700; color: white !important;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .nav-link { color: rgba(255,255,255,0.9) !important; font-weight: 500; padding: 0.5rem 1rem !important; border-radius: 8px; transition: all 0.3s; }
+    .nav-link:hover { background: rgba(255,255,255,0.15); color: white !important; }
+    #modeToggle { border: 2px solid rgba(255,255,255,0.4); border-radius: 25px; padding: 0.4rem 1.1rem; font-weight: 600; transition: all 0.3s; }
+    #modeToggle:hover { background: rgba(255,255,255,0.2); }
+
+    /* HERO */
+    .lekolin-hero {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      color: white;
+      padding: 5rem 0 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .lekolin-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 30% 50%, rgba(37,99,235,0.3) 0%, transparent 60%),
+                  radial-gradient(ellipse at 70% 30%, rgba(124,58,237,0.2) 0%, transparent 50%);
+    }
+    .lekolin-hero h1 {
+      font-size: 3rem; font-weight: 800; position: relative; z-index: 1;
+      margin-bottom: 1rem;
+    }
+    .lekolin-hero p { font-size: 1.2rem; opacity: 0.8; position: relative; z-index: 1; }
+    .hero-icon {
+      font-size: 4rem; margin-bottom: 1.5rem; position: relative; z-index: 1;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* TABS */
+    .tab-nav {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      padding: 2rem 0 1rem;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      padding: 0.9rem 2.5rem;
+      border-radius: 50px;
+      border: 3px solid transparent;
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex; align-items: center; gap: 0.5rem;
+      background: var(--card);
+      color: var(--muted);
+    }
+    .tab-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+    .tab-btn.adabi.active { background: var(--adabi); color: white; border-color: var(--adabi); box-shadow: 0 8px 20px rgba(124,58,237,0.3); }
+    .tab-btn.honari.active { background: var(--honari); color: white; border-color: var(--honari); box-shadow: 0 8px 20px rgba(219,39,119,0.3); }
+    .tab-btn.zansti.active { background: var(--zansti); color: white; border-color: var(--zansti); box-shadow: 0 8px 20px rgba(5,150,105,0.3); }
+    .tab-btn.adabi { border-color: var(--adabi); color: var(--adabi); }
+    .tab-btn.honari { border-color: var(--honari); color: var(--honari); }
+    .tab-btn.zansti { border-color: var(--zansti); color: var(--zansti); }
+
+    /* CONTENT SECTIONS */
+    .tab-content-area { display: none; animation: fadeUp 0.5s ease; }
+    .tab-content-area.active { display: block; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* SECTION HEADER */
+    .section-banner {
+      border-radius: 20px;
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+      color: white;
+      display: flex; align-items: center; gap: 2rem;
+      position: relative; overflow: hidden;
+    }
+    .section-banner::after {
+      content: attr(data-icon);
+      position: absolute; right: -1rem; top: -1rem;
+      font-size: 8rem; opacity: 0.1;
+    }
+    .banner-adabi { background: linear-gradient(135deg, #7c3aed, #4c1d95); }
+    .banner-honari { background: linear-gradient(135deg, #db2777, #9d174d); }
+    .banner-zansti { background: linear-gradient(135deg, #059669, #065f46); }
+    .section-banner h2 { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .section-banner p { opacity: 0.85; font-size: 1rem; }
+    .banner-icon { font-size: 4rem; opacity: 0.9; }
+
+    /* CARDS */
+    .research-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+    .research-card {
+      background: var(--card);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: flex; flex-direction: column;
+    }
+    .research-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); color: inherit; }
+    .card-img-wrap {
+      position: relative; padding-top: 55%; overflow: hidden;
+    }
+    .card-img-wrap img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; transition: transform 0.5s ease;
+    }
+    .research-card:hover .card-img-wrap img { transform: scale(1.08); }
+    .card-badge {
+      position: absolute; top: 1rem; right: 1rem;
+      padding: 0.3rem 0.8rem; border-radius: 20px;
+      font-size: 0.8rem; font-weight: 700; color: white;
+    }
+    .badge-adabi { background: var(--adabi); }
+    .badge-honari { background: var(--honari); }
+    .badge-zansti { background: var(--zansti); }
+    .card-body {
+      padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;
+    }
+    .card-body h4 { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.8rem; line-height: 1.5; }
+    .card-body p { color: var(--muted); font-size: 0.95rem; line-height: 1.7; flex-grow: 1; }
+    .card-meta {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 1rem; padding-top: 1rem;
+      border-top: 1px solid rgba(0,0,0,0.05);
+      font-size: 0.85rem; color: var(--muted);
+    }
+    .read-more-btn {
+      padding: 0.5rem 1.2rem;
+      border-radius: 20px; font-size: 0.9rem; font-weight: 600;
+      border: none; cursor: pointer; transition: all 0.3s;
+      color: white;
+    }
+    .btn-adabi { background: var(--adabi); }
+    .btn-honari { background: var(--honari); }
+    .btn-zansti { background: var(--zansti); }
+    .read-more-btn:hover { opacity: 0.85; transform: scale(1.05); }
+
+    /* FEATURED ARTICLE */
+    .featured-article {
+      background: var(--card);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      margin-bottom: 2rem;
+    }
+    @media (max-width: 768px) {
+      .featured-article { grid-template-columns: 1fr; }
+    }
+    .featured-img { height: 100%; min-height: 300px; object-fit: cover; width: 100%; }
+    .featured-body { padding: 2.5rem; display: flex; flex-direction: column; justify-content: center; }
+    .featured-tag {
+      display: inline-block; padding: 0.3rem 1rem; border-radius: 20px;
+      font-size: 0.85rem; font-weight: 700; color: white; margin-bottom: 1rem;
+    }
+    .featured-body h3 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; line-height: 1.3; }
+    .featured-body p { color: var(--muted); line-height: 1.8; margin-bottom: 1.5rem; }
+
+    /* EMPTY STATE */
+    .empty-research {
+      text-align: center; padding: 4rem 2rem; color: var(--muted);
+    }
+    .empty-research i { font-size: 4rem; opacity: 0.3; margin-bottom: 1rem; display: block; }
+
+    /* DARK MODE */
+    .dark-mode .research-card { box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+    .dark-mode .tab-btn { background: #1e293b; }
+    .dark-mode .card-meta { border-top-color: rgba(255,255,255,0.05); }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container">
+    <a class="navbar-brand" href="{{ url_for('index') }}">
+      <i class="fas fa-book-open"></i> کتیبخانەی xor
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}"><i class="fas fa-home"></i> ماڵەوە</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('nusar') }}"><i class="fas fa-users"></i> نووسەران</a></li>
+        <li class="nav-item"><a class="nav-link active" href="{{ url_for('lekolin') }}"><i class="fas fa-flask"></i> لێکۆڵینەوە</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('honraw') }}"><i class="fas fa-feather-alt"></i> هۆنراوە</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('ferheng') }}"><i class="fas fa-spell-check"></i> فەرهەنگ</a></li>
+        {% if session.get('logged_in') %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_panel') }}"><i class="fas fa-cog"></i> بەڕێوەبردن</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> چونەدەرەوە</a></li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt"></i> چوونەژوورەوە</a></li>
+        {% endif %}
+      </ul>
+      <button id="modeToggle" class="btn btn-outline-light btn-sm"><i class="fas fa-moon"></i> تاریک</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="lekolin-hero">
+  <div class="container">
+    <div class="hero-icon"><i class="fas fa-microscope"></i></div>
+    <h1>بەشی لێکۆڵینەوە</h1>
+    <p>تەکستی لێکۆڵینەوە لە بواری ئەدەبی، هونەری و زانستیدا</p>
+  </div>
+</div>
+
+<div class="container mt-4">
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} rounded-3">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <!-- TABS -->
+  <div class="tab-nav">
+    <button class="tab-btn adabi active" onclick="switchTab('adabi', this)">
+      <i class="fas fa-book"></i> ئەدەبی
+    </button>
+    <button class="tab-btn honari" onclick="switchTab('honari', this)">
+      <i class="fas fa-palette"></i> هونەری
+    </button>
+    <button class="tab-btn zansti" onclick="switchTab('zansti', this)">
+      <i class="fas fa-atom"></i> زانستی
+    </button>
+  </div>
+
+  <!-- ADABI SECTION -->
+  <div id="tab-adabi" class="tab-content-area active">
+    <div class="section-banner banner-adabi" data-icon="📚">
+      <div class="banner-icon"><i class="fas fa-book"></i></div>
+      <div>
+        <h2>لێکۆڵینەوەی ئەدەبی</h2>
+        <p>لێکۆڵینەوە و شیکاری لە بواری نووسین، دەبیات و ئەدەبی کوردیدا</p>
+      </div>
+    </div>
+
+    {% if adabi_articles %}
+      <!-- Featured -->
+      {% if adabi_articles[0] %}
+      <div class="featured-article">
+        <img src="{{ url_for('static', filename='lekolin/' ~ adabi_articles[0]['image']) }}" class="featured-img" alt="{{ adabi_articles[0]['title'] }}">
+        <div class="featured-body">
+          <span class="featured-tag" style="background: var(--adabi);">لێکۆڵینەوەی ئەدەبی</span>
+          <h3>{{ adabi_articles[0]['title'] }}</h3>
+          <p>{{ adabi_articles[0]['summary'][:200] }}...</p>
+          <a href="{{ url_for('lekolin_detail', article_id=adabi_articles[0]['id']) }}" class="read-more-btn btn-adabi" style="width: fit-content;">
+            <i class="fas fa-arrow-left"></i> زیاتر بخوێنەرەوە
+          </a>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="research-grid">
+        {% for article in adabi_articles[1:] %}
+        <a href="{{ url_for('lekolin_detail', article_id=article['id']) }}" class="research-card">
+          <div class="card-img-wrap">
+            <img src="{{ url_for('static', filename='lekolin/' ~ article['image']) }}" alt="{{ article['title'] }}">
+            <span class="card-badge badge-adabi">ئەدەبی</span>
+          </div>
+          <div class="card-body">
+            <h4>{{ article['title'] }}</h4>
+            <p>{{ article['summary'][:120] }}...</p>
+            <div class="card-meta">
+              <span><i class="fas fa-calendar-alt"></i> {{ article['created_at'][:10] }}</span>
+              <button class="read-more-btn btn-adabi">زیاتر</button>
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    {% else %}
+    <div class="empty-research">
+      <i class="fas fa-book-open"></i>
+      <h4>هیچ لێکۆڵینەوەیەکی ئەدەبی نییە</h4>
+      <p>بەزووانە زیاد دەکرێت</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- HONARI SECTION -->
+  <div id="tab-honari" class="tab-content-area">
+    <div class="section-banner banner-honari" data-icon="🎨">
+      <div class="banner-icon"><i class="fas fa-palette"></i></div>
+      <div>
+        <h2>لێکۆڵینەوەی هونەری</h2>
+        <p>لێکۆڵینەوە و شیکاری لە بواری هونەر، موسیقا و سینەماکاریدا</p>
+      </div>
+    </div>
+
+    {% if honari_articles %}
+      {% if honari_articles[0] %}
+      <div class="featured-article">
+        <img src="{{ url_for('static', filename='lekolin/' ~ honari_articles[0]['image']) }}" class="featured-img" alt="{{ honari_articles[0]['title'] }}">
+        <div class="featured-body">
+          <span class="featured-tag" style="background: var(--honari);">لێکۆڵینەوەی هونەری</span>
+          <h3>{{ honari_articles[0]['title'] }}</h3>
+          <p>{{ honari_articles[0]['summary'][:200] }}...</p>
+          <a href="{{ url_for('lekolin_detail', article_id=honari_articles[0]['id']) }}" class="read-more-btn btn-honari" style="width: fit-content;">
+            <i class="fas fa-arrow-left"></i> زیاتر بخوێنەرەوە
+          </a>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="research-grid">
+        {% for article in honari_articles[1:] %}
+        <a href="{{ url_for('lekolin_detail', article_id=article['id']) }}" class="research-card">
+          <div class="card-img-wrap">
+            <img src="{{ url_for('static', filename='lekolin/' ~ article['image']) }}" alt="{{ article['title'] }}">
+            <span class="card-badge badge-honari">هونەری</span>
+          </div>
+          <div class="card-body">
+            <h4>{{ article['title'] }}</h4>
+            <p>{{ article['summary'][:120] }}...</p>
+            <div class="card-meta">
+              <span><i class="fas fa-calendar-alt"></i> {{ article['created_at'][:10] }}</span>
+              <button class="read-more-btn btn-honari">زیاتر</button>
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    {% else %}
+    <div class="empty-research">
+      <i class="fas fa-palette"></i>
+      <h4>هیچ لێکۆڵینەوەیەکی هونەری نییە</h4>
+      <p>بەزووانە زیاد دەکرێت</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ZANSTI SECTION -->
+  <div id="tab-zansti" class="tab-content-area">
+    <div class="section-banner banner-zansti" data-icon="🔬">
+      <div class="banner-icon"><i class="fas fa-atom"></i></div>
+      <div>
+        <h2>لێکۆڵینەوەی زانستی</h2>
+        <p>لێکۆڵینەوە و کتێبەکانی زانستی، تەکنەلۆجیا و وروورداکاری</p>
+      </div>
+    </div>
+
+    {% if zansti_articles %}
+      {% if zansti_articles[0] %}
+      <div class="featured-article">
+        <img src="{{ url_for('static', filename='lekolin/' ~ zansti_articles[0]['image']) }}" class="featured-img" alt="{{ zansti_articles[0]['title'] }}">
+        <div class="featured-body">
+          <span class="featured-tag" style="background: var(--zansti);">لێکۆڵینەوەی زانستی</span>
+          <h3>{{ zansti_articles[0]['title'] }}</h3>
+          <p>{{ zansti_articles[0]['summary'][:200] }}...</p>
+          <a href="{{ url_for('lekolin_detail', article_id=zansti_articles[0]['id']) }}" class="read-more-btn btn-zansti" style="width: fit-content;">
+            <i class="fas fa-arrow-left"></i> زیاتر بخوێنەرەوە
+          </a>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="research-grid">
+        {% for article in zansti_articles[1:] %}
+        <a href="{{ url_for('lekolin_detail', article_id=article['id']) }}" class="research-card">
+          <div class="card-img-wrap">
+            <img src="{{ url_for('static', filename='lekolin/' ~ article['image']) }}" alt="{{ article['title'] }}">
+            <span class="card-badge badge-zansti">زانستی</span>
+          </div>
+          <div class="card-body">
+            <h4>{{ article['title'] }}</h4>
+            <p>{{ article['summary'][:120] }}...</p>
+            <div class="card-meta">
+              <span><i class="fas fa-calendar-alt"></i> {{ article['created_at'][:10] }}</span>
+              <button class="read-more-btn btn-zansti">زیاتر</button>
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    {% else %}
+    <div class="empty-research">
+      <i class="fas fa-atom"></i>
+      <h4>هیچ لێکۆڵینەوەیەکی زانستی نییە</h4>
+      <p>بەزووانە زیاد دەکرێت</p>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<div style="height: 80px;"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  function switchTab(tab, btn) {
+    document.querySelectorAll('.tab-content-area').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  // Dark mode
+  const modeToggle = document.getElementById('modeToggle');
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark-mode');
+    modeToggle.innerHTML = '<i class="fas fa-sun"></i> ڕۆشنایی';
+  }
+  modeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    modeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i> ڕۆشنایی' : '<i class="fas fa-moon"></i> تاریک';
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="ku" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ article['title'] }} - کتیبخانەی Xor</title>
+  <link rel="icon" href="{{ url_for('static', filename='book.png') }}" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --secondary: #1d4ed8;
+      --adabi: #7c3aed;
+      --honari: #db2777;
+      --zansti: #059669;
+      --bg: #fefdfb;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+    }
+    body.dark-mode { --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --muted: #94a3b8; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); transition: all 0.3s; }
+
+    .navbar { background: linear-gradient(135deg, var(--primary), var(--secondary)) !important; box-shadow: 0 4px 20px rgba(0,0,0,0.15); padding: 1rem 0; }
+    .navbar-brand { font-size: 1.5rem; font-weight: 700; color: white !important; display: flex; align-items: center; gap: 0.5rem; }
+    .nav-link { color: rgba(255,255,255,0.9) !important; font-weight: 500; padding: 0.5rem 1rem !important; border-radius: 8px; transition: all 0.3s; }
+    .nav-link:hover { background: rgba(255,255,255,0.15); }
+    #modeToggle { border: 2px solid rgba(255,255,255,0.4); border-radius: 25px; padding: 0.4rem 1.1rem; font-weight: 600; }
+
+    /* HERO */
+    .article-hero {
+      position: relative; min-height: 450px;
+      display: flex; align-items: flex-end; overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center;
+      filter: brightness(0.3); transition: transform 8s ease;
+    }
+    .article-hero:hover .hero-bg { transform: scale(1.04); }
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.3) 55%, transparent 100%);
+    }
+    .hero-content {
+      position: relative; z-index: 2;
+      padding: 3rem 1.5rem 2.5rem;
+      width: 100%; max-width: 860px; margin: 0 auto;
+    }
+    .cat-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.4rem 1.2rem; border-radius: 25px;
+      font-size: 0.9rem; font-weight: 700; color: white;
+      margin-bottom: 1rem; backdrop-filter: blur(8px);
+    }
+    .badge-adabi  { background: rgba(124,58,237,0.85); }
+    .badge-honari { background: rgba(219,39,119,0.85); }
+    .badge-zansti { background: rgba(5,150,105,0.85); }
+    .hero-content h1 {
+      font-size: 2.5rem; font-weight: 800; color: white;
+      line-height: 1.3; margin-bottom: 1rem;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+    }
+    .hero-meta { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; color: rgba(255,255,255,0.7); font-size: 0.9rem; }
+    .hero-meta span { display: flex; align-items: center; gap: 0.4rem; }
+
+    /* NO IMAGE fallback */
+    .no-img-hero {
+      {% if article['category'] == 'ئەدەبی' %}background: linear-gradient(135deg,#4c1d95,#7c3aed);
+      {% elif article['category'] == 'هونەری' %}background: linear-gradient(135deg,#9d174d,#db2777);
+      {% else %}background: linear-gradient(135deg,#065f46,#059669);{% endif %}
+      filter: none !important;
+    }
+
+    /* LAYOUT */
+    .page-wrap { max-width: 1060px; margin: 0 auto; padding: 2.5rem 1.5rem; display: grid; grid-template-columns: 1fr 280px; gap: 2rem; align-items: start; }
+    @media(max-width:860px){ .page-wrap{grid-template-columns:1fr;} .sidebar-col{order:-1;} }
+
+    .back-link { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--primary); text-decoration: none; font-weight: 600; margin-bottom: 1.5rem; transition: all 0.3s; }
+    .back-link:hover { transform: translateX(4px); }
+
+    /* ARTICLE CARD */
+    .article-card { background: var(--card); border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.07); overflow: hidden; }
+    .dark-mode .article-card { box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+
+    .summary-box {
+      padding: 2rem 2.5rem;
+      border-bottom: 1px solid rgba(0,0,0,0.07);
+      {% if article['category'] == 'ئەدەبی' %}background: linear-gradient(135deg, rgba(124,58,237,0.06), rgba(124,58,237,0.02));
+      {% elif article['category'] == 'هونەری' %}background: linear-gradient(135deg, rgba(219,39,119,0.06), rgba(219,39,119,0.02));
+      {% else %}background: linear-gradient(135deg, rgba(5,150,105,0.06), rgba(5,150,105,0.02));{% endif %}
+    }
+    .dark-mode .summary-box { border-bottom-color: rgba(255,255,255,0.06); }
+    .summary-label { font-size: 0.78rem; font-weight: 700; letter-spacing: 1px; color: var(--muted); margin-bottom: 0.7rem; display: flex; align-items: center; gap: 0.4rem; }
+    .summary-box p { font-size: 1.1rem; line-height: 1.9; color: var(--muted); font-style: italic; }
+
+    .accent-line {
+      height: 3px; margin: 0 2.5rem;
+      {% if article['category'] == 'ئەدەبی' %}background: linear-gradient(to left, transparent, var(--adabi), transparent);
+      {% elif article['category'] == 'هونەری' %}background: linear-gradient(to left, transparent, var(--honari), transparent);
+      {% else %}background: linear-gradient(to left, transparent, var(--zansti), transparent);{% endif %}
+    }
+
+    .article-body { padding: 2.5rem; font-size: 1.12rem; line-height: 2.1; color: var(--text); white-space: pre-wrap; }
+
+    .article-footer {
+      padding: 1.5rem 2.5rem;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    }
+    .dark-mode .article-footer { border-top-color: rgba(255,255,255,0.06); }
+
+    /* SIDEBAR */
+    .sidebar-col { display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-box { background: var(--card); border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.06); }
+    .dark-mode .sidebar-box { box-shadow: 0 4px 15px rgba(0,0,0,0.25); }
+    .sidebar-box h4 { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+
+    .info-row { display: flex; align-items: center; gap: 0.8rem; padding: 0.7rem; background: rgba(0,0,0,0.02); border-radius: 10px; margin-bottom: 0.5rem; }
+    .dark-mode .info-row { background: rgba(255,255,255,0.03); }
+    .info-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; color: white; flex-shrink: 0; }
+    .info-label { font-size: 0.78rem; color: var(--muted); font-weight: 600; }
+    .info-val { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+
+    /* RELATED */
+    .related-card { display: flex; gap: 0.8rem; padding: 0.7rem; border-radius: 10px; text-decoration: none; color: inherit; transition: all 0.3s; margin-bottom: 0.5rem; }
+    .related-card:hover { background: rgba(0,0,0,0.04); color: inherit; }
+    .dark-mode .related-card:hover { background: rgba(255,255,255,0.04); }
+    .related-img { width: 60px; height: 50px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
+    .related-title { font-size: 0.9rem; font-weight: 600; line-height: 1.4; }
+    .related-cat { font-size: 0.78rem; color: var(--muted); margin-top: 0.2rem; }
+
+    /* ADMIN */
+    .admin-bar { padding: 1rem 2.5rem; border-top: 1px solid rgba(0,0,0,0.06); display: flex; gap: 0.8rem; }
+    .dark-mode .admin-bar { border-top-color: rgba(255,255,255,0.06); }
+    .btn-del { padding: 0.5rem 1.3rem; background: #ef4444; color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; transition: all 0.3s; text-decoration: none; }
+    .btn-del:hover { background: #dc2626; color: white; transform: translateY(-2px); }
+
+    /* PRINT */
+    .btn-print { padding: 0.5rem 1.3rem; background: var(--card); border: 2px solid rgba(0,0,0,0.1); color: var(--text); border-radius: 10px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; transition: all 0.3s; }
+    .dark-mode .btn-print { border-color: rgba(255,255,255,0.1); }
+    .btn-print:hover { transform: translateY(-2px); }
+
+    @media print {
+      .navbar, .back-link, .sidebar-col, .admin-bar, .article-footer, #modeToggle { display: none !important; }
+      .page-wrap { grid-template-columns: 1fr; padding: 0; }
+      .article-body { font-size: 12pt; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container">
+    <a class="navbar-brand" href="{{ url_for('index') }}"><i class="fas fa-book-open"></i> کتیبخانەی xor</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}"><i class="fas fa-home"></i> ماڵەوە</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('nusar') }}"><i class="fas fa-users"></i> نووسەران</a></li>
+        <li class="nav-item"><a class="nav-link active" href="{{ url_for('lekolin') }}"><i class="fas fa-flask"></i> لێکۆڵینەوە</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('honraw') }}"><i class="fas fa-feather-alt"></i> هۆنراوە</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('ferheng') }}"><i class="fas fa-spell-check"></i> فەرهەنگ</a></li>
+        {% if session.get('logged_in') %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_panel') }}"><i class="fas fa-cog"></i> بەڕێوەبردن</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> چونەدەرەوە</a></li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt"></i> چوونەژوورەوە</a></li>
+        {% endif %}
+      </ul>
+      <button id="modeToggle" class="btn btn-outline-light btn-sm"><i class="fas fa-moon"></i> تاریک</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="article-hero">
+  {% if article['image'] %}
+  <div class="hero-bg" style="background-image: url('{{ url_for('static', filename='lekolin/' ~ article['image']) }}');"></div>
+  {% else %}
+  <div class="hero-bg no-img-hero"></div>
+  {% endif %}
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="cat-badge
+      {% if article['category'] == 'ئەدەبی' %}badge-adabi
+      {% elif article['category'] == 'هونەری' %}badge-honari
+      {% else %}badge-zansti{% endif %}">
+      {% if article['category'] == 'ئەدەبی' %}<i class="fas fa-book"></i>
+      {% elif article['category'] == 'هونەری' %}<i class="fas fa-palette"></i>
+      {% else %}<i class="fas fa-atom"></i>{% endif %}
+      {{ article['category'] }}
+    </div>
+    <h1>{{ article['title'] }}</h1>
+    <div class="hero-meta">
+      <span><i class="fas fa-calendar-alt"></i> {{ article['created_at'][:10] if article['created_at'] else '' }}</span>
+      {% if article['content'] %}
+      <span><i class="fas fa-align-right"></i> {{ article['content']|length }} پیت</span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- PAGE -->
+<div class="page-wrap">
+
+  <!-- MAIN -->
+  <div class="main-col">
+    <a href="{{ url_for('lekolin') }}" class="back-link">
+      <i class="fas fa-arrow-right"></i> گەڕانەوە بۆ لێکۆڵینەوەکان
+    </a>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}{% for cat, msg in messages %}
+        <div class="alert alert-{{ cat }} rounded-3 mb-3">{{ msg }}</div>
+      {% endfor %}{% endif %}
+    {% endwith %}
+
+    <div class="article-card">
+
+      {% if article['summary'] %}
+      <div class="summary-box">
+        <div class="summary-label"><i class="fas fa-quote-right"></i> کورتە</div>
+        <p>{{ article['summary'] }}</p>
+      </div>
+      <div class="accent-line"></div>
+      {% endif %}
+
+      <div class="article-body">{{ article['content'] }}</div>
+
+      <div class="article-footer">
+        <div style="display:flex;align-items:center;gap:0.8rem;color:var(--muted);font-size:0.9rem;">
+          <i class="fas fa-calendar-alt"></i>
+          بەرواری بڵاوکردنەوە: {{ article['created_at'][:10] if article['created_at'] else 'نادیار' }}
+        </div>
+        <button class="btn-print" onclick="window.print()">
+          <i class="fas fa-print"></i> چاپکردن
+        </button>
+      </div>
+
+      {% if session.get('logged_in') %}
+      <div class="admin-bar">
+        <a href="{{ url_for('delete_lekolin', article_id=article['id']) }}"
+           onclick="return confirm('دڵنیایت لە سڕینەوەی ئەم توێژینەوەیە؟')"
+           class="btn-del"><i class="fas fa-trash"></i> سڕینەوە</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar-col">
+
+    <!-- INFO BOX -->
+    <div class="sidebar-box">
+      <h4>
+        {% if article['category'] == 'ئەدەبی' %}<i class="fas fa-book" style="color:var(--adabi);"></i>
+        {% elif article['category'] == 'هونەری' %}<i class="fas fa-palette" style="color:var(--honari);"></i>
+        {% else %}<i class="fas fa-atom" style="color:var(--zansti);"></i>{% endif %}
+        زانیاری توێژینەوە
+      </h4>
+
+      <div class="info-row">
+        <div class="info-icon" style="
+          {% if article['category'] == 'ئەدەبی' %}background:var(--adabi);
+          {% elif article['category'] == 'هونەری' %}background:var(--honari);
+          {% else %}background:var(--zansti);{% endif %}">
+          <i class="fas fa-tag"></i>
+        </div>
+        <div>
+          <div class="info-label">پۆلێن</div>
+          <div class="info-val">{{ article['category'] }}</div>
+        </div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-icon" style="background:var(--primary);">
+          <i class="fas fa-calendar-alt"></i>
+        </div>
+        <div>
+          <div class="info-label">بەرواری زیادکردن</div>
+          <div class="info-val">{{ article['created_at'][:10] if article['created_at'] else 'نادیار' }}</div>
+        </div>
+      </div>
+
+      {% if article['content'] %}
+      <div class="info-row">
+        <div class="info-icon" style="background:#f59e0b;">
+          <i class="fas fa-align-right"></i>
+        </div>
+        <div>
+          <div class="info-label">قەبارەی دەق</div>
+          <div class="info-val">{{ article['content']|length }} پیت</div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- SHARE BOX -->
+    <div class="sidebar-box">
+      <h4><i class="fas fa-share-alt" style="color:var(--primary);"></i> بەشکردن</h4>
+      <div style="display:flex;flex-direction:column;gap:0.6rem;">
+        <button onclick="copyLink()" style="padding:0.6rem 1rem;background:var(--primary);color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:0.5rem;justify-content:center;">
+          <i class="fas fa-link"></i> کۆپیکردنی بەستەر
+        </button>
+        <button onclick="window.print()" style="padding:0.6rem 1rem;background:rgba(0,0,0,0.05);color:var(--text);border:none;border-radius:10px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:0.5rem;justify-content:center;">
+          <i class="fas fa-print"></i> چاپکردن
+        </button>
+      </div>
+      <div id="copyMsg" style="display:none;margin-top:0.8rem;text-align:center;color:green;font-weight:600;font-size:0.9rem;">
+        <i class="fas fa-check-circle"></i> بەستەر کۆپیکرا!
+      </div>
+    </div>
+
+    <!-- BACK NAVIGATION -->
+    <div class="sidebar-box">
+      <h4><i class="fas fa-compass" style="color:var(--primary);"></i> گەشتکردن</h4>
+      <div style="display:flex;flex-direction:column;gap:0.5rem;">
+        <a href="{{ url_for('lekolin') }}" style="padding:0.6rem 1rem;background:rgba(0,0,0,0.03);border-radius:10px;text-decoration:none;color:var(--text);font-weight:600;display:flex;align-items:center;gap:0.5rem;transition:all 0.3s;">
+          <i class="fas fa-flask" style="color:var(--primary);"></i> هەموو لێکۆڵینەوەکان
+        </a>
+        <a href="{{ url_for('index') }}" style="padding:0.6rem 1rem;background:rgba(0,0,0,0.03);border-radius:10px;text-decoration:none;color:var(--text);font-weight:600;display:flex;align-items:center;gap:0.5rem;transition:all 0.3s;">
+          <i class="fas fa-home" style="color:var(--primary);"></i> ماڵپەڕ
+        </a>
+        <a href="{{ url_for('honraw') }}" style="padding:0.6rem 1rem;background:rgba(0,0,0,0.03);border-radius:10px;text-decoration:none;color:var(--text);font-weight:600;display:flex;align-items:center;gap:0.5rem;transition:all 0.3s;">
+          <i class="fas fa-feather-alt" style="color:#db2777;"></i> هۆنراوەکان
+        </a>
+        <a href="{{ url_for('ferheng') }}" style="padding:0.6rem 1rem;background:rgba(0,0,0,0.03);border-radius:10px;text-decoration:none;color:var(--text);font-weight:600;display:flex;align-items:center;gap:0.5rem;transition:all 0.3s;">
+          <i class="fas fa-spell-check" style="color:#0d9488;"></i> فەرهەنگ
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div style="height:80px;"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Dark mode
+  const modeToggle = document.getElementById('modeToggle');
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark-mode');
+    modeToggle.innerHTML = '<i class="fas fa-sun"></i> ڕۆشنایی';
+  }
+  modeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    modeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i> ڕۆشنایی' : '<i class="fas fa-moon"></i> تاریک';
+  });
+
+  // Copy link
+  function copyLink() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      const msg = document.getElementById('copyMsg');
+      msg.style.display = 'block';
+      setTimeout(() => msg.style.display = 'none', 2500);
+    });
+  }
+</script>
+</body>
+</html>

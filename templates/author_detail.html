@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="ku" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ author['title'] }} - کتیبخانەی Xor</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --secondary-color: #1d4ed8;
+    }
+
+    body {
+      background: #fefdfb;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .navbar {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .navbar-brand, .nav-link {
+      color: white !important;
+    }
+
+    .author-detail-container {
+      max-width: 1200px;
+      margin: 3rem auto;
+      padding: 0 1rem;
+    }
+
+    .author-card {
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .author-layout {
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 3rem;
+      padding: 3rem;
+    }
+
+    @media (max-width: 992px) {
+      .author-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding: 2rem;
+      }
+    }
+
+    .author-image-section {
+      position: relative;
+      text-align: center;
+    }
+
+    .author-image {
+      width: 100%;
+      max-width: 300px;
+      border-radius: 50%;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      transition: transform 0.3s ease;
+      border: 5px solid #e0f2fe;
+    }
+
+    .author-image:hover {
+      transform: scale(1.05);
+    }
+
+    .author-info-section h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 1.5rem;
+      line-height: 1.3;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 1rem;
+      background: #f8fafc;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .info-item:hover {
+      background: #e0f2fe;
+      transform: translateX(-5px);
+    }
+
+    .info-icon {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.3rem;
+      margin-left: 1rem;
+      flex-shrink: 0;
+    }
+
+    .info-content {
+      flex-grow: 1;
+    }
+
+    .info-label {
+      font-size: 0.85rem;
+      color: #64748b;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+
+    .info-value {
+      font-size: 1rem;
+      color: #1e293b;
+      font-weight: 500;
+      line-height: 1.8;
+    }
+
+    .bio-section {
+      background: #f8fafc;
+      padding: 2rem;
+      border-radius: 15px;
+      margin-top: 2rem;
+    }
+
+    .bio-section h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .bio-text {
+      color: #475569;
+      line-height: 2;
+      font-size: 1.05rem;
+      white-space: pre-wrap;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+      margin-bottom: 2rem;
+      transition: all 0.3s ease;
+    }
+
+    .back-link:hover {
+      color: var(--secondary-color);
+      transform: translateX(5px);
+    }
+
+    .btn-delete {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-delete:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container">
+    <a class="navbar-brand" href="{{ url_for('index') }}">
+      <i class="fas fa-book-open"></i> کتیبخانەی xor
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('index') }}">
+            <i class="fas fa-home"></i> ماڵەوە
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('nusar') }}">
+            <i class="fas fa-users"></i> نووسەران
+          </a>
+        </li>
+        {% if session.get('logged_in') %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('admin_panel') }}">
+              <i class="fas fa-cog"></i> بەڕێوەبردن
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('logout') }}">
+              <i class="fas fa-sign-out-alt"></i> چونەدەرەوە
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container author-detail-container">
+  <a href="{{ url_for('nusar') }}" class="back-link">
+    <i class="fas fa-arrow-right"></i>
+    گەڕانەوە بۆ لیستی نووسەران
+  </a>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="author-card">
+    <div class="author-layout">
+      <div class="author-image-section">
+        {% if author['image'] %}
+        <img src="{{ url_for('static', filename='authors/' ~ author['image']) }}" 
+             class="author-image" 
+             alt="{{ author['title'] }}">
+        {% else %}
+        <img src="https://ui-avatars.com/api/?name={{ author['title'] }}&size=400&background=2563eb&color=fff&bold=true" 
+             class="author-image" 
+             alt="{{ author['title'] }}">
+        {% endif %}
+      </div>
+
+      <div class="author-info-section">
+        <h1>{{ author['title'] }}</h1>
+
+        <div class="info-item">
+          <div class="info-icon">
+            <i class="fas fa-user-tie"></i>
+          </div>
+          <div class="info-content">
+            <div class="info-label">پیشە</div>
+            <div class="info-value">نووسەر</div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon">
+            <i class="fas fa-calendar-alt"></i>
+          </div>
+          <div class="info-content">
+            <div class="info-label">بەرواری زیادکردن</div>
+            <div class="info-value">{{ author['created_at'][:10] if author['created_at'] else 'نادیار' }}</div>
+          </div>
+        </div>
+
+        {% if author['zhyannama'] %}
+        <div class="bio-section">
+          <h3>
+            <i class="fas fa-book-reader"></i>
+            دەربارەی نووسەر
+          </h3>
+          <div class="bio-text">{{ author['zhyannama'] }}</div>
+        </div>
+        {% endif %}
+
+        {% if session.get('logged_in') %}
+        <a href="{{ url_for('delete_author', author_id=author['id']) }}" 
+           class="btn-delete"
+           onclick="return confirm('دڵنیایت لە سڕینەوەی ئەم نووسەرە؟')">
+          <i class="fas fa-trash"></i>
+          سڕینەوەی نووسەر
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="height: 100px;"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
